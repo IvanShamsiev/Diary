@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".notes.NoteDetailsActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"/>
+
+    <TextView
+        android:id="@+id/twLastChangeTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:text="Последнее изменение: 01.01.1970 00:00" />
+
+    <EditText
+        android:id="@+id/etNoteText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="5dp"
+        android:background="@null"
+        android:gravity="start"
+        android:inputType="textMultiLine"
+        android:focusable="true"
+        android:text="Текст заметки"
+        android:textAlignment="viewStart" />
+
+</LinearLayout>

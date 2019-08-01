@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/listItemTask_twText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="10pt"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Название задачи" />
+
+    <TextView
+        android:id="@+id/listItemTask_twLastChangeTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="5pt"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="01.01.1970 00:00" />
+
+</LinearLayout>
