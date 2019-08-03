@@ -20,15 +20,12 @@ import com.example.diary.db.DbManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 public class NotesFragment extends Fragment {
-
-    Collection<Note> allNotes;
 
     ListView notesListView;
 
@@ -45,8 +42,6 @@ public class NotesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        allNotes = DbManager.getAllNotes();
     }
 
     @Override
@@ -59,8 +54,9 @@ public class NotesFragment extends Fragment {
 
         notesListView = view.findViewById(R.id.notesListView);
         setListViewAdapter();
-        notesListView.setOnItemClickListener((adapterView, v, pos, id) ->
-                editNote(new ArrayList<>(allNotes).get(pos)));
+        notesListView.setOnItemClickListener((adapterView, v, pos, id) -> {
+            editNote(getNoteFromMap(adapterView.getItemAtPosition(pos)));
+        });
         registerForContextMenu(notesListView);
 
         return view;
@@ -69,7 +65,7 @@ public class NotesFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == NOTE_DETAILS_CODE && resultCode == NOTE_CHANGED_CODE) {
-            allNotes = DbManager.getAllNotes();
+            DbManager.updateNotes();
             setListViewAdapter();
         }
     }
@@ -81,15 +77,15 @@ public class NotesFragment extends Fragment {
 
     private void editNote(Note note) {
         Intent intent = new Intent(getContext(), NoteDetailsActivity.class);
-        intent.putExtra("note", note);
+        intent.putExtra("noteId", note.getId());
         startActivityForResult(intent, NOTE_DETAILS_CODE);
     }
 
     private void setListViewAdapter() {
-        List<HashMap<String, String>> data = new ArrayList<>(allNotes.size());
+        List<HashMap<String, String>> data = new ArrayList<>();
 
         HashMap<String, String> map;
-        for (Note n : allNotes) {
+        for (Note n : DbManager.getAllNotes()) {
             map = new HashMap<>(2);
 
             map.put("id", String.valueOf(n.getId()));
@@ -123,23 +119,19 @@ public class NotesFragment extends Fragment {
                     .setPositiveButton("Да", (di, i) -> {
                         AdapterView.AdapterContextMenuInfo menuInfo =
                                 (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                        HashMap<String, String> noteMap = (HashMap<String, String>)
-                                notesListView.getItemAtPosition(menuInfo.position);
-                        DbManager.deleteNote(Integer.valueOf(noteMap.get("id")));
-                        allNotes = DbManager.getAllNotes();
+                        Note n = getNoteFromMap(notesListView.getItemAtPosition(menuInfo.position));
+                        DbManager.deleteNote(n.getId());
+                        DbManager.updateNotes();
                         setListViewAdapter();
                     })
                     .show();
+            return true;
         }
-        return true;
+        return super.onContextItemSelected(item);
     }
 
-    /*private Note getNoteById(int id) {
-        for (Note n: allNotes) if (n.getId() == id) return n;
-        throw new RuntimeException("Записи с ID = " + id + " не существует");
+    private Note getNoteFromMap(Object o) {
+        HashMap<String, String> map = (HashMap<String, String>) o;
+        return DbManager.getNoteById(map.get("id"));
     }
-
-    private Note getNoteById(String id) {
-        return getNoteById(Integer.parseInt(id));
-    }*/
 }

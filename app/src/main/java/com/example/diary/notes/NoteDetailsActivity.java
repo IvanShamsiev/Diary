@@ -42,8 +42,12 @@ public class NoteDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setNavigationOnClickListener(view -> onBackPressed());
 
-        note = getIntent().getParcelableExtra("note");
-        isNewNote = note.getId() == -1;
+        int id = getIntent().getIntExtra("noteId", Integer.MIN_VALUE);
+        if (id == -1) {
+            isNewNote = true;
+            note = new Note(-1, "", new Date(System.currentTimeMillis()));
+        }
+        else note = DbManager.getNoteById(id);
 
         twLastChangeTime = findViewById(R.id.twLastChangeTime);
         editNote = findViewById(R.id.etNoteText);
@@ -112,7 +116,9 @@ public class NoteDetailsActivity extends AppCompatActivity {
             return;
         }
 
-        note = isNewNote ? DbManager.addNote(newText) : DbManager.updateNote(note.getId(), newText);
+        note.setText(newText);
+
+        note = isNewNote ? DbManager.addNote(note) : DbManager.updateNote(note.getId(), newText);
     }
 
     private void setLastChangeTime(Date lastChangeTime) {

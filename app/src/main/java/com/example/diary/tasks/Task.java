@@ -11,24 +11,24 @@ public class Task {
 
     private int id;
     private String name;
-    private String category;
+    private String description;
 
     private int childFor;
 
     private Collection<Task> childTasks;
 
-    public Task(int id, String name, String category, int childFor) {
+    public Task(int id, String name, String description, int childFor) {
         this.id = id;
         this.name = name;
-        this.category = category;
+        this.description = description;
         this.childFor = childFor;
         this.childTasks = new ArrayList<>();
     }
 
-    public Task(String id, String name, String category, String childFor) {
+    public Task(String id, String name, String description, String childFor) {
         this.id = Integer.parseInt(id);
         this.name = name;
-        this.category = category;
+        this.description = description;
         this.childFor = Integer.parseInt(childFor);
         this.childTasks = new ArrayList<>();
     }
@@ -37,16 +37,32 @@ public class Task {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
 
-    public String getCategory() {
-        return category;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getChildFor() {
         return childFor;
+    }
+
+    public void setChildFor(int childFor) {
+        this.childFor = childFor;
     }
 
     public Collection<Task> getChildTasks() {

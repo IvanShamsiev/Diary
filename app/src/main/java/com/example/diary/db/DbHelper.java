@@ -11,9 +11,9 @@ import java.util.List;
 
 import static com.example.diary.MainActivity.LOG_TAG;
 
-class DbHelper extends SQLiteOpenHelper {
+public class DbHelper extends SQLiteOpenHelper {
 
-    DbHelper(Context context) {
+    public DbHelper(Context context) {
         super(context, "MyDatabase", null, 1);
     }
 
@@ -32,6 +32,7 @@ class DbHelper extends SQLiteOpenHelper {
         db.execSQL("create table Tasks (" +
                 "id integer primary key, " +
                 "name text, " +
+                "description text, " +
                 "category text," +
                 "childFor integer" +
                 ")"
@@ -43,7 +44,7 @@ class DbHelper extends SQLiteOpenHelper {
         List<String> defaultNotesText = Arrays.asList("Текст записи 1", "Текст записи 2", "Текст записи 3", "Текст записи 4", "Текст записи 5");
 
         List<String> defaultTasksName = Arrays.asList("Задача 1", "Задача 2", "Задача 3", "Задача 4", "Задача 5");
-        List<String> defaultTasksCategory = Arrays.asList("Главная категория", "Главная категория", "Второстепенная категория", "Второстепенная категория", "Главная категория");
+        List<String> defaultTasksDescription = Arrays.asList("Описание задачи 1", "Описание задачи 2", "Описание задачи 3", "Описание задачи 4", "Описание задачи 5");
         List<Integer> defaultTasksChildFor = Arrays.asList(-1, -1, -1, 1, 2);
 
 
@@ -59,7 +60,7 @@ class DbHelper extends SQLiteOpenHelper {
         for (int i = 0; i < defaultTasksName.size(); i++) {
             contentValues.clear();
             contentValues.put("name", defaultTasksName.get(i));
-            contentValues.put("category", defaultTasksCategory.get(i));
+            contentValues.put("description", defaultTasksDescription.get(i));
             contentValues.put("childFor", defaultTasksChildFor.get(i));
             db.insert("Tasks", null, contentValues);
         }
