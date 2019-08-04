@@ -4,6 +4,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -27,7 +29,10 @@ public class NoteDetailsActivity extends AppCompatActivity {
 
     AlertDialog closeDialog, deleteDialog;
 
+    MenuItem saveBtn;
+
     boolean isNewNote;
+    boolean saved = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +65,18 @@ public class NoteDetailsActivity extends AppCompatActivity {
             editNote.requestFocus();
         }
 
+        editNote.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                saved = false;
+                if (!saveBtn.isVisible()) saveBtn.setVisible(true);
+            }
+        });
+
 
 
         closeDialog = new AlertDialog.Builder(this)
@@ -91,11 +108,15 @@ public class NoteDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem item = menu.add("Удалить заметку");
-        item.setIcon(android.R.drawable.ic_menu_delete);
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        item.setOnMenuItemClickListener(menuItem -> {
+        getMenuInflater().inflate(R.menu.menu_note_details, menu);
+        MenuItem deleteItem = menu.getItem(0);
+        saveBtn = menu.getItem(1);
+        deleteItem.setOnMenuItemClickListener(menuItem -> {
             deleteDialog.show();
+            return true;
+        });
+        saveBtn.setOnMenuItemClickListener(menuItem -> {
+            saveNote();
             return true;
         });
         return true;
@@ -104,7 +125,7 @@ public class NoteDetailsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         boolean changed = !note.getText().equals(editNote.getText().toString());
-        if (!changed) finish();
+        if (!changed || saved) finish();
         else closeDialog.show();
     }
 
@@ -119,6 +140,12 @@ public class NoteDetailsActivity extends AppCompatActivity {
         note.setText(newText);
 
         note = isNewNote ? DbManager.addNote(note) : DbManager.updateNote(note.getId(), newText);
+
+        setLastChangeTime(note.getLastChangeTime());
+
+        saved = true;
+
+        saveBtn.setVisible(false);
     }
 
     private void setLastChangeTime(Date lastChangeTime) {

@@ -125,8 +125,8 @@ public class TasksFragment extends Fragment {
             data.add(map);
         }
 
-        String[] from = {"name", "childFor"};
-        int[] to = {R.id.listItemTask_twName, R.id.listItemTask_twChildFor};
+        String[] from = {"name"};
+        int[] to = {R.id.listItemTask_twName};
 
         SimpleAdapter adapter = new SimpleAdapter(getContext(), data, R.layout.list_item_task, from, to);
         tasksListView.setAdapter(adapter);

@@ -20,6 +20,9 @@ import com.example.diary.db.DbManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +67,7 @@ public class NotesFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == NOTE_DETAILS_CODE && resultCode == NOTE_CHANGED_CODE) {
+        if (requestCode == NOTE_DETAILS_CODE) {
             DbManager.updateNotes();
             setListViewAdapter();
         }
@@ -85,7 +88,10 @@ public class NotesFragment extends Fragment {
         List<HashMap<String, String>> data = new ArrayList<>();
 
         HashMap<String, String> map;
-        for (Note n : DbManager.getAllNotes()) {
+        List<Note> notes = new ArrayList<>(DbManager.getAllNotes());
+        Collections.sort(notes, (note, n2) ->
+                n2.getLastChangeTime().compareTo(note.getLastChangeTime()));
+        for (Note n : notes) {
             map = new HashMap<>(2);
 
             map.put("id", String.valueOf(n.getId()));
