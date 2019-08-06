@@ -4,10 +4,11 @@
     android:layout_height="wrap_content"
     android:paddingTop="4dp"
     android:paddingBottom="4dp"
+    android:background="?android:selectableItemBackground"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/listItemTask_twText"
+        android:id="@+id/listItemNote_twText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="12pt"
@@ -16,7 +17,7 @@
         android:text="Название задачи" />
 
     <TextView
-        android:id="@+id/listItemTask_twLastChangeTime"
+        android:id="@+id/listItemNote_twLastChangeTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="end"

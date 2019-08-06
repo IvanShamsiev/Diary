@@ -11,6 +11,7 @@ import com.example.diary.tasks.Task;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import static com.example.diary.MainActivity.LOG_TAG;
 
@@ -18,8 +19,8 @@ public class DbManager {
 
     private static SQLiteDatabase db;
 
-    private static Collection<Note> allNotes;
-    private static Collection<Task> allTasks;
+    private static List<Note> allNotes;
+    private static List<Task> allTasks;
 
     public static void setDb(SQLiteDatabase db) {
         DbManager.db = db;
@@ -34,7 +35,7 @@ public class DbManager {
     public static void updateNotes() {
         Cursor c = db.rawQuery("SELECT * FROM Notes", null);
 
-        Collection<Note> notes = new ArrayList<>();
+        List<Note> notes = new ArrayList<>();
 
         if (c.moveToFirst()) {
             do {
@@ -47,7 +48,7 @@ public class DbManager {
         allNotes = notes;
     }
 
-    public static Collection<Note> getAllNotes() {
+    public static List<Note> getAllNotes() {
         return allNotes;
     }
 
@@ -97,7 +98,7 @@ public class DbManager {
     public static void updateTasks() {
         Cursor c = db.rawQuery("SELECT * FROM Tasks", null);
 
-        Collection<Task> tasks = new ArrayList<>();
+        List<Task> tasks = new ArrayList<>();
 
         if (c.moveToFirst()) {
             do {

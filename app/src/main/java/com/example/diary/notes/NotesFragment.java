@@ -6,13 +6,15 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.example.diary.R;
@@ -20,23 +22,21 @@ import com.example.diary.db.DbManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import static com.example.diary.MainActivity.LOG_TAG;
+
 public class NotesFragment extends Fragment {
 
-    ListView notesListView;
+    RecyclerView notesListView;
+    NotesAdapter adapter;
 
     public static final int NOTE_DETAILS_CODE = 0;
     public static final int NOTE_CHANGED_CODE = 1;
-
-    public static final SimpleDateFormat dateFormat =
-            new SimpleDateFormat("dd.mm.yyyy HH:mm", Locale.getDefault());
 
     public static NotesFragment newInstance() {
         return new NotesFragment();
@@ -55,22 +55,38 @@ public class NotesFragment extends Fragment {
         FloatingActionButton fab = view.findViewById(R.id.fabNotes);
         fab.setOnClickListener(btn -> createNewNote());
 
-        notesListView = view.findViewById(R.id.notesListView);
-        setListViewAdapter();
-        notesListView.setOnItemClickListener((adapterView, v, pos, id) -> {
-            editNote(getNoteFromMap(adapterView.getItemAtPosition(pos)));
-        });
-        registerForContextMenu(notesListView);
+        notesListView = view.findViewById(R.id.recyclerViewNotes);
+        notesListView.setLayoutManager(new LinearLayoutManager(getContext(),
+                LinearLayoutManager.VERTICAL, false));
+        adapter = new NotesAdapter(this::editNote);
+        adapter.setNotes(new ArrayList<>(DbManager.getAllNotes()));
+        notesListView.setAdapter(adapter);
 
         return view;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == NOTE_DETAILS_CODE) {
-            DbManager.updateNotes();
-            setListViewAdapter();
+        if (resultCode == NOTE_CHANGED_CODE)
+        adapter.dataUpdate();
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getTitle().equals("Удалить заметку")) {
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Удалить заметку")
+                    .setMessage("Вы действительно хотите удалить заметку?")
+                    .setNegativeButton("Нет", (di, i) -> di.cancel())
+                    .setPositiveButton("Да", (di, i) -> {
+                        DbManager.deleteNote(item.getItemId());
+                        adapter.dataUpdate();
+                    })
+                    .show();
+            return true;
         }
+        Log.d(LOG_TAG, "ID: " + item.getItemId());
+        return super.onContextItemSelected(item);
     }
 
     private void createNewNote() {
@@ -82,62 +98,5 @@ public class NotesFragment extends Fragment {
         Intent intent = new Intent(getContext(), NoteDetailsActivity.class);
         intent.putExtra("noteId", note.getId());
         startActivityForResult(intent, NOTE_DETAILS_CODE);
-    }
-
-    private void setListViewAdapter() {
-        List<HashMap<String, String>> data = new ArrayList<>();
-
-        HashMap<String, String> map;
-        List<Note> notes = new ArrayList<>(DbManager.getAllNotes());
-        Collections.sort(notes, (note, n2) ->
-                n2.getLastChangeTime().compareTo(note.getLastChangeTime()));
-        for (Note n : notes) {
-            map = new HashMap<>(2);
-
-            map.put("id", String.valueOf(n.getId()));
-            map.put("text", n.getText());
-            map.put("lastChangeTime", "Последнее изменение: " +
-                    dateFormat.format(n.getLastChangeTime()));
-
-            data.add(map);
-        }
-
-        String[] from = {"text", "lastChangeTime"};
-        int[] to = {R.id.listItemTask_twText, R.id.listItemTask_twLastChangeTime};
-
-        SimpleAdapter adapter = new SimpleAdapter(getContext(), data, R.layout.list_item_note, from, to);
-        notesListView.setAdapter(adapter);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        if (v.equals(notesListView)) menu.add("Удалить заметку");
-        super.onCreateContextMenu(menu, v, menuInfo);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if (item.getTitle().equals("Удалить заметку")) {
-            new AlertDialog.Builder(getContext())
-                    .setTitle("Удалить заметку")
-                    .setMessage("Вы действительно хотите удалить заметку?")
-                    .setNegativeButton("Нет", (di, i) -> di.cancel())
-                    .setPositiveButton("Да", (di, i) -> {
-                        AdapterView.AdapterContextMenuInfo menuInfo =
-                                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                        Note n = getNoteFromMap(notesListView.getItemAtPosition(menuInfo.position));
-                        DbManager.deleteNote(n.getId());
-                        DbManager.updateNotes();
-                        setListViewAdapter();
-                    })
-                    .show();
-            return true;
-        }
-        return super.onContextItemSelected(item);
-    }
-
-    private Note getNoteFromMap(Object o) {
-        HashMap<String, String> map = (HashMap<String, String>) o;
-        return DbManager.getNoteById(map.get("id"));
     }
 }

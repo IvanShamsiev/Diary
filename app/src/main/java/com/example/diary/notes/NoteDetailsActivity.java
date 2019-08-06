@@ -19,8 +19,8 @@ import com.example.diary.db.DbManager;
 import java.util.Date;
 
 import static com.example.diary.MainActivity.LOG_TAG;
+import static com.example.diary.notes.NotesAdapter.dateFormat;
 import static com.example.diary.notes.NotesFragment.NOTE_CHANGED_CODE;
-import static com.example.diary.notes.NotesFragment.dateFormat;
 
 public class NoteDetailsActivity extends AppCompatActivity {
 
@@ -88,7 +88,6 @@ public class NoteDetailsActivity extends AppCompatActivity {
                 .setMessage("Заметка была изменена, сохранить изменения?")
                 .setPositiveButton("Да", (di, i) -> {
                     saveNote();
-                    setResult(NOTE_CHANGED_CODE);
                     finish();
                 })
                 .setNegativeButton("Нет", (di, i) -> finish())
@@ -144,12 +143,15 @@ public class NoteDetailsActivity extends AppCompatActivity {
         note.setText(newText);
 
         note = isNewNote ? DbManager.addNote(note) : DbManager.updateNote(note.getId(), newText);
+        isNewNote = false;
 
         setLastChangeTime(note.getLastChangeTime());
 
         saved = true;
 
         saveBtn.setVisible(false);
+
+        setResult(NOTE_CHANGED_CODE);
     }
 
     private void setLastChangeTime(Date lastChangeTime) {

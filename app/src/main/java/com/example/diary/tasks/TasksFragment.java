@@ -87,7 +87,6 @@ public class TasksFragment extends Fragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        Log.d(LOG_TAG, "123");
         if (item.getTitle().equals("Удалить задачу")) {
             new AlertDialog.Builder(getContext())
                     .setTitle("Удалить задачу")
