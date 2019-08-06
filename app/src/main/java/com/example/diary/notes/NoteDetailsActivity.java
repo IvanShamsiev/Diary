@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -17,6 +18,7 @@ import com.example.diary.db.DbManager;
 
 import java.util.Date;
 
+import static com.example.diary.MainActivity.LOG_TAG;
 import static com.example.diary.notes.NotesFragment.NOTE_CHANGED_CODE;
 import static com.example.diary.notes.NotesFragment.dateFormat;
 
@@ -72,8 +74,10 @@ public class NoteDetailsActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
             public void afterTextChanged(Editable editable) {
-                saved = false;
-                if (!saveBtn.isVisible()) saveBtn.setVisible(true);
+                /*saved = false;
+                if (!saveBtn.isVisible()) saveBtn.setVisible(true);*/
+                Log.d(LOG_TAG, "Saved");
+                saveNote();
             }
         });
 
