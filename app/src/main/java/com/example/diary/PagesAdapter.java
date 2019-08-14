@@ -9,7 +9,7 @@ import com.example.diary.tasks.TasksFragment;
 
 public class PagesAdapter extends FragmentPagerAdapter {
 
-    static final int NUM_PAGES = 2;
+    private static final int NUM_PAGES = 2;
 
     PagesAdapter(FragmentManager fm) {
         super(fm);

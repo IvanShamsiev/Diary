@@ -9,24 +9,16 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.SimpleAdapter;
 
 import com.example.diary.R;
-import com.example.diary.db.DbManager;
+import com.example.diary.db.DiaryDao;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 import static com.example.diary.MainActivity.LOG_TAG;
 
@@ -59,7 +51,7 @@ public class NotesFragment extends Fragment {
         notesListView.setLayoutManager(new LinearLayoutManager(getContext(),
                 LinearLayoutManager.VERTICAL, false));
         adapter = new NotesAdapter(this::editNote);
-        adapter.setNotes(new ArrayList<>(DbManager.getAllNotes()));
+        adapter.setNotes(new ArrayList<>(DiaryDao.getAllNotes()));
         notesListView.setAdapter(adapter);
 
         return view;
@@ -67,8 +59,7 @@ public class NotesFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == NOTE_CHANGED_CODE)
-        adapter.dataUpdate();
+        if (resultCode == NOTE_CHANGED_CODE) adapter.dataUpdate();
     }
 
     @Override
@@ -79,7 +70,7 @@ public class NotesFragment extends Fragment {
                     .setMessage("Вы действительно хотите удалить заметку?")
                     .setNegativeButton("Нет", (di, i) -> di.cancel())
                     .setPositiveButton("Да", (di, i) -> {
-                        DbManager.deleteNote(item.getItemId());
+                        DiaryDao.deleteNote(item.getItemId());
                         adapter.dataUpdate();
                     })
                     .show();

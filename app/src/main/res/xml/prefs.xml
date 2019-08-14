@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Настройки заметок">
+
+        <SwitchPreference
+            android:key="notes_auto_save_switch_preference"
+            android:title="Автоматическое сохранение"
+            android:summaryOn="Включено автоматическое сохранение"
+            android:summaryOff="Включено ручное сохранение"
+            android:defaultValue="false"/>
+
+        <SwitchPreference
+            android:key="notes_save_dialog_switch_preference"
+            android:title="Диалог выхода без сохранения"
+            android:summaryOn="Диалог показывается"
+            android:summaryOff="Диалог не показывается"
+            android:defaultValue="true"/>
+        <EditTextPreference
+            android:key="notes_text_size_preference"
+            android:title="Размер шрифта"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:defaultValue="20"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

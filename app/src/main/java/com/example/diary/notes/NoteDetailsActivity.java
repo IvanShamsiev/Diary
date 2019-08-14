@@ -1,12 +1,13 @@
 package com.example.diary.notes;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -14,17 +15,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.diary.R;
-import com.example.diary.db.DbManager;
+import com.example.diary.db.DiaryDao;
 
 import java.util.Date;
 
-import static com.example.diary.MainActivity.LOG_TAG;
 import static com.example.diary.notes.NotesAdapter.dateFormat;
 import static com.example.diary.notes.NotesFragment.NOTE_CHANGED_CODE;
 
 public class NoteDetailsActivity extends AppCompatActivity {
 
-    TextView twLastChangeTime;
     EditText editNote;
 
     Note note;
@@ -36,10 +35,15 @@ public class NoteDetailsActivity extends AppCompatActivity {
     boolean isNewNote;
     boolean saved = true;
 
+    boolean autoSaveActive = false;
+    boolean saveDialogActive = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_details);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         setTitle("Заметка");
 
@@ -54,9 +58,7 @@ public class NoteDetailsActivity extends AppCompatActivity {
             isNewNote = true;
             note = new Note(-1, "", new Date(System.currentTimeMillis()));
         }
-        else note = DbManager.getNoteById(id);
-
-        twLastChangeTime = findViewById(R.id.twLastChangeTime);
+        else note = DiaryDao.getNoteById(id);
         editNote = findViewById(R.id.etNoteText);
 
         setLastChangeTime(note.getLastChangeTime());
@@ -74,16 +76,23 @@ public class NoteDetailsActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
             public void afterTextChanged(Editable editable) {
-                /*saved = false;
-                if (!saveBtn.isVisible()) saveBtn.setVisible(true);*/
-                Log.d(LOG_TAG, "Saved");
-                saveNote();
+                saved = false;
+                if (autoSaveActive) saveNote();
+                else if (!saveBtn.isVisible()) saveBtn.setVisible(true);
             }
         });
 
 
+        autoSaveActive = preferences.getBoolean("notes_auto_save_switch_preference", false);
+        saveDialogActive = preferences.getBoolean("notes_save_dialog_switch_preference", true);
+        float textSize = 20;
+        try {
+            String size = preferences.getString("notes_text_size_preference", "20");
+            textSize = Float.parseFloat(size);
+        } catch (Exception ignored) { }
+        editNote.setTextSize(textSize);
 
-        closeDialog = new AlertDialog.Builder(this)
+        if (saveDialogActive) closeDialog = new AlertDialog.Builder(this)
                 .setTitle("Сохранить?")
                 .setMessage("Заметка была изменена, сохранить изменения?")
                 .setPositiveButton("Да", (di, i) -> {
@@ -94,32 +103,35 @@ public class NoteDetailsActivity extends AppCompatActivity {
                 .setNeutralButton("Отмена", (di, i) -> di.cancel())
                 .create();
 
-        deleteDialog = new AlertDialog.Builder(this)
-                .setTitle("Удалить заметку")
-                .setMessage("Вы действительно хотите удалить заметку?")
-                .setNegativeButton("Нет", (di, i) -> di.cancel())
-                .setPositiveButton("Да", (di, i) -> {
-                    if (!isNewNote) {
-                        DbManager.deleteNote(note.getId());
-                        setResult(NOTE_CHANGED_CODE);
-                    }
-                    finish();
-                })
-                .create();
-
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_note_details, menu);
         MenuItem deleteItem = menu.getItem(0);
-        saveBtn = menu.getItem(1);
         deleteItem.setOnMenuItemClickListener(menuItem -> {
+            if (deleteDialog == null)
+                deleteDialog = new AlertDialog.Builder(this)
+                        .setTitle("Удалить заметку")
+                        .setMessage("Вы действительно хотите удалить заметку?")
+                        .setNegativeButton("Нет", (di, i) -> di.cancel())
+                        .setPositiveButton("Да", (di, i) -> {
+                            if (!isNewNote) {
+                                DiaryDao.deleteNote(note.getId());
+                                setResult(NOTE_CHANGED_CODE);
+                            }
+                            finish();
+                        })
+                        .create();
             deleteDialog.show();
             return true;
         });
+        saveBtn = menu.getItem(1);
+        saveBtn.setVisible(false);
         saveBtn.setOnMenuItemClickListener(menuItem -> {
             saveNote();
+            menuItem.setVisible(false);
             return true;
         });
         return true;
@@ -129,32 +141,35 @@ public class NoteDetailsActivity extends AppCompatActivity {
     public void onBackPressed() {
         boolean changed = !note.getText().equals(editNote.getText().toString());
         if (!changed || saved) finish();
-        else closeDialog.show();
+        else if (saveDialogActive) closeDialog.show();
+        else { saveNote(); finish(); }
     }
 
     private void saveNote() {
         String newText = editNote.getText().toString();
 
         if (newText.isEmpty()) {
-            if (!isNewNote) DbManager.deleteNote(note.getId());
+            if (!isNewNote) {
+                DiaryDao.deleteNote(note.getId());
+                setResult(NOTE_CHANGED_CODE);
+            }
             return;
         }
 
         note.setText(newText);
 
-        note = isNewNote ? DbManager.addNote(note) : DbManager.updateNote(note.getId(), newText);
+        note = isNewNote ? DiaryDao.addNote(note) : DiaryDao.updateNote(note.getId(), newText);
         isNewNote = false;
 
         setLastChangeTime(note.getLastChangeTime());
 
         saved = true;
 
-        saveBtn.setVisible(false);
-
         setResult(NOTE_CHANGED_CODE);
     }
 
     private void setLastChangeTime(Date lastChangeTime) {
+        TextView twLastChangeTime = findViewById(R.id.twLastChangeTime);
         twLastChangeTime.setText("Последнее изменение: " + dateFormat.format(lastChangeTime));
     }
 }

@@ -6,32 +6,23 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.example.diary.R;
-import com.example.diary.db.DbManager;
+import com.example.diary.db.DiaryDao;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
-import static com.example.diary.MainActivity.LOG_TAG;
 
 public class TasksFragment extends Fragment {
 
@@ -74,7 +65,7 @@ public class TasksFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == TASK_DETAILS_CODE && resultCode == TASK_CHANGED_CODE) {
-            DbManager.updateTasks();
+            DiaryDao.updateTasks();
             setListViewAdapter();
         }
     }
@@ -96,8 +87,8 @@ public class TasksFragment extends Fragment {
                         AdapterView.AdapterContextMenuInfo menuInfo =
                                 (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                         Task t = getTaskFromMap(tasksListView.getItemAtPosition(menuInfo.position));
-                        DbManager.deleteTask(t.getId());
-                        DbManager.updateTasks();
+                        DiaryDao.deleteTask(t.getId());
+                        DiaryDao.updateTasks();
                         setListViewAdapter();
                     })
                     .show();
@@ -112,13 +103,13 @@ public class TasksFragment extends Fragment {
         HashMap<String, String> map;
 
         Collection<Task> mainTasks = new ArrayList<>();
-        for (Task t: DbManager.getAllTasks()) if (t.getChildFor() == Task.NOT_CHILD) mainTasks.add(t);
+        for (Task t: DiaryDao.getAllTasks()) if (t.getChildFor() == Task.NOT_CHILD) mainTasks.add(t);
         for (Task t : mainTasks) {
             map = new HashMap<>(5);
             map.put("id", String.valueOf(t.getId()));
             map.put("name", t.getName());
             map.put("description", t.getDescription());
-            map.put("childFor", t.getChildFor() == Task.NOT_CHILD ? "" : DbManager.getTaskById(t.getChildFor()).getName());
+            map.put("childFor", t.getChildFor() == Task.NOT_CHILD ? "" : DiaryDao.getTaskById(t.getChildFor()).getName());
             map.put("childTasks", Arrays.toString(t.getChildTasks().toArray()));
 
             data.add(map);
@@ -144,7 +135,7 @@ public class TasksFragment extends Fragment {
 
     private Task getTaskFromMap(Object o) {
         HashMap<String, String> map = (HashMap<String, String>) o;
-        return DbManager.getTaskById(map.get("id"));
+        return DiaryDao.getTaskById(map.get("id"));
     }
 
     /*public static void expand(final View v) {

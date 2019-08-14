@@ -4,17 +4,15 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.diary.R;
-import com.example.diary.db.DbManager;
+import com.example.diary.db.DiaryDao;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,10 +23,10 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
     private List<Note> notes;
 
-    private OnNoteClickListener noteClickListener;
+    private OnNoteClickListener onNoteClickListener;
 
     NotesAdapter(OnNoteClickListener listener) {
-        noteClickListener = listener;
+        onNoteClickListener = listener;
     }
 
     @NonNull
@@ -58,8 +56,8 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
     }
 
     void dataUpdate() {
-        DbManager.updateNotes();
-        setNotes(DbManager.getAllNotes());
+        DiaryDao.updateNotes();
+        setNotes(DiaryDao.getAllNotes());
     }
 
     class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
@@ -73,7 +71,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
             super(itemView);
             twText = itemView.findViewById(R.id.listItemNote_twText);
             twLastChangeTime = itemView.findViewById(R.id.listItemNote_twLastChangeTime);
-            itemView.setOnClickListener(v -> noteClickListener.onClick(notes.get(getLayoutPosition())));
+            itemView.setOnClickListener(v -> onNoteClickListener.onClick(notes.get(getLayoutPosition())));
             itemView.setOnCreateContextMenuListener(this);
         }
 

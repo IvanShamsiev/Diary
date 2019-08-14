@@ -9,13 +9,12 @@ import com.example.diary.notes.Note;
 import com.example.diary.tasks.Task;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import static com.example.diary.MainActivity.LOG_TAG;
 
-public class DbManager {
+public class DiaryDao {
 
     private static SQLiteDatabase db;
 
@@ -23,7 +22,7 @@ public class DbManager {
     private static List<Task> allTasks;
 
     public static void setDb(SQLiteDatabase db) {
-        DbManager.db = db;
+        DiaryDao.db = db;
 
         updateNotes();
         updateTasks();
@@ -121,7 +120,7 @@ public class DbManager {
                 getTaskById(child.getChildFor()).addChildTask(child);
     }
 
-    public static Collection<Task> getAllTasks() {
+    public static List<Task> getAllTasks() {
         return allTasks;
     }
 
@@ -173,4 +172,5 @@ public class DbManager {
     public static void destroy() {
         db.close();
     }
+
 }
