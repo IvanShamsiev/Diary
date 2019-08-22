@@ -1,5 +1,6 @@
-package com.example.diary.notes;
+package com.example.diary.ui.notes;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,19 +17,17 @@ import android.view.ViewGroup;
 
 import com.example.diary.R;
 import com.example.diary.db.DiaryDao;
+import com.example.diary.model.Note;
 
 import java.util.ArrayList;
-import java.util.Date;
 
-import static com.example.diary.MainActivity.LOG_TAG;
+import static com.example.diary.ui.MainActivity.LOG_TAG;
 
 public class NotesFragment extends Fragment {
 
-    RecyclerView notesListView;
     NotesAdapter adapter;
 
     public static final int NOTE_DETAILS_CODE = 0;
-    public static final int NOTE_CHANGED_CODE = 1;
 
     public static NotesFragment newInstance() {
         return new NotesFragment();
@@ -44,14 +43,19 @@ public class NotesFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_notes, container, false);
 
+        // Set fab
         FloatingActionButton fab = view.findViewById(R.id.fabNotes);
         fab.setOnClickListener(btn -> createNewNote());
 
-        notesListView = view.findViewById(R.id.recyclerViewNotes);
+        // Set adapter
+        adapter = new NotesAdapter(note -> startActivityForResult(
+                NoteDetailsActivity.getIntent(getContext(), note.getId()), NOTE_DETAILS_CODE));
+        adapter.setNotes(new ArrayList<>(DiaryDao.getAllNotes()));
+
+        // Set recycler view
+        RecyclerView notesListView = view.findViewById(R.id.recyclerViewNotes);
         notesListView.setLayoutManager(new LinearLayoutManager(getContext(),
                 LinearLayoutManager.VERTICAL, false));
-        adapter = new NotesAdapter(this::editNote);
-        adapter.setNotes(new ArrayList<>(DiaryDao.getAllNotes()));
         notesListView.setAdapter(adapter);
 
         return view;
@@ -59,18 +63,20 @@ public class NotesFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == NOTE_CHANGED_CODE) adapter.dataUpdate();
+        if (resultCode != Activity.RESULT_OK) return;
+        if (requestCode == NOTE_DETAILS_CODE) adapter.dataUpdate();
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        long id = item.getIntent().getLongExtra("noteId", -1);
         if (item.getTitle().equals("Удалить заметку")) {
             new AlertDialog.Builder(getContext())
-                    .setTitle("Удалить заметку")
-                    .setMessage("Вы действительно хотите удалить заметку?")
-                    .setNegativeButton("Нет", (di, i) -> di.cancel())
-                    .setPositiveButton("Да", (di, i) -> {
-                        DiaryDao.deleteNote(item.getItemId());
+                    .setTitle(R.string.delete_note_question)
+                    .setMessage(R.string.delete_note_msg)
+                    .setNegativeButton(R.string.no, (di, i) -> di.cancel())
+                    .setPositiveButton(R.string.yes, (di, i) -> {
+                        DiaryDao.deleteNote(id);
                         adapter.dataUpdate();
                     })
                     .show();
@@ -81,7 +87,7 @@ public class NotesFragment extends Fragment {
     }
 
     private void createNewNote() {
-        Note note = new Note(-1, "", new Date(System.currentTimeMillis()));
+        Note note = new Note(-1, "", System.currentTimeMillis());
         editNote(note);
     }
 

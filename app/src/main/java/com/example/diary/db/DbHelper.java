@@ -9,7 +9,7 @@ import android.util.Log;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.example.diary.MainActivity.LOG_TAG;
+import static com.example.diary.ui.MainActivity.LOG_TAG;
 
 public class DbHelper extends SQLiteOpenHelper {
 

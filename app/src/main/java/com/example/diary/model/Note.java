@@ -1,30 +1,36 @@
-package com.example.diary.notes;
+package com.example.diary.model;
 
 import java.util.Date;
 
 public class Note {
 
-    private int id;
+    private long id;
     private String text;
     private Date lastChangeTime;
 
-    public Note(int id, String text, Date lastChangeTime) {
+    public Note(long id, String text, long lastChangeTime) {
+        this.id = id;
+        this.text = text;
+        this.lastChangeTime = new Date(lastChangeTime);
+    }
+
+    public Note(long id, String text, Date lastChangeTime) {
         this.id = id;
         this.text = text;
         this.lastChangeTime = lastChangeTime;
     }
 
     public Note(String id, String text, String lastChangeTime) {
-        this.id = Integer.parseInt(id);
+        this.id = Long.parseLong(id);
         this.text = text;
         this.lastChangeTime = new Date(Long.parseLong(lastChangeTime));
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -46,5 +52,18 @@ public class Note {
 
     public void setLastChangeTime(long lastChangeTime) {
         this.lastChangeTime = new Date(lastChangeTime);
+    }
+
+    public static Note getEmptyNote() {
+        return new Note(-1, "", System.currentTimeMillis());
+    }
+
+    @Override
+    public String toString() {
+        return "Note{" +
+                "id=" + id +
+                ", text='" + text + '\'' +
+                ", lastChangeTime=" + lastChangeTime +
+                '}';
     }
 }

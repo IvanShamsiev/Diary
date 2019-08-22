@@ -3,19 +3,21 @@
     package="com.example.diary">
 
     <application
+        android:name=".DiaryApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PreferencesActivity" />
-        <activity android:name=".notes.NoteDetailsActivity"
+        <activity android:name=".ui.prefs.PreferencesActivity" />
+        <activity android:name=".ui.notes.NoteDetailsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".tasks.TaskDetailsActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.tasks.TaskDetailsActivity" />
+        <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

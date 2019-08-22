@@ -5,14 +5,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.example.diary.notes.Note;
-import com.example.diary.tasks.Task;
+import com.example.diary.model.Note;
+import com.example.diary.model.Task;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static com.example.diary.MainActivity.LOG_TAG;
+import static com.example.diary.ui.MainActivity.LOG_TAG;
 
 public class DiaryDao {
 
@@ -51,7 +50,7 @@ public class DiaryDao {
         return allNotes;
     }
 
-    public static Note getNoteById(int id) {
+    public static Note getNoteById(long id) {
         for (Note n: allNotes) if (n.getId() == id) return n;
         throw new RuntimeException("Записи с ID = " + id + " не существует");
     }
@@ -60,7 +59,13 @@ public class DiaryDao {
         return getNoteById(Integer.parseInt(id));
     }
 
-    public static Note addNote(Note n) {
+    public static Note saveNote(Note n) {
+
+        if (n.getText().isEmpty()) {
+            deleteNote(n.getId());
+            return Note.getEmptyNote();
+        }
+
         ContentValues cv = new ContentValues(2);
 
         long currentTime = System.currentTimeMillis();
@@ -68,25 +73,17 @@ public class DiaryDao {
         cv.put("text", n.getText());
         cv.put("lastChangeTime", currentTime);
 
-        int id = (int) db.insert("Notes", null, cv);
+        long id;
 
-        return new Note(id, n.getText(), new Date(currentTime));
+        if (n.getId() != -1) {
+            db.update("Notes", cv, "id = ?", getStringArrayId(n.getId()));
+            id = n.getId();
+        } else id = db.insert("Notes", null, cv);
+
+        return new Note(id, n.getText(), currentTime);
     }
 
-    public static Note updateNote(int id, String text) {
-        ContentValues cv = new ContentValues(2);
-
-        long currentTime = System.currentTimeMillis();
-
-        cv.put("text", text);
-        cv.put("lastChangeTime", currentTime);
-
-        db.update("Notes", cv, "id = ?", getStringArrayId(id));
-
-        return new Note(id, text, new Date(currentTime));
-    }
-
-    public static void deleteNote(int id) {
+    public static void deleteNote(long id) {
         db.delete("Notes","id = ?", getStringArrayId(id));
     }
 
@@ -165,7 +162,7 @@ public class DiaryDao {
 
 
 
-    private static String[] getStringArrayId(int id) {
+    private static String[] getStringArrayId(long id) {
         return new String[] { String.valueOf(id) };
     }
 

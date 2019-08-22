@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:focusableInTouchMode="true"
-    tools:context=".notes.NoteDetailsActivity">
+    tools:context=".ui.notes.NoteDetailsActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -24,17 +24,19 @@
         android:layout_marginTop="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:text="Последнее изменение: 01.01.1970 00:00" />
+        tools:text="Последнее изменение: 01.01.1970 00:00" />
 
     <EditText
         android:id="@+id/etNoteText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:importantForAutofill="no"
+        android:hint="@string/note_text"
+        tools:text="@string/note_text"
         android:layout_margin="5dp"
         android:background="@null"
         android:gravity="start"
         android:inputType="textMultiLine"
-        android:text="Текст заметки"
-        android:textAlignment="viewStart" />
+        android:textAlignment="viewStart"/>
 
 </LinearLayout>

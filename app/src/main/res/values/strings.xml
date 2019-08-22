@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Дневник</string>
+
+    <string name="note">Заметка</string>
+    <string name="note_text">Текст заметки</string>
+    <string name="last_change">Последнее изменение: %s</string>
+
+    <string name="save_note_question">Сохранить?</string>
+    <string name="save_note_msg">Заметка была изменена, сохранить изменения?</string>
+    <string name="delete_note_question">Удалить заметку?</string>
+    <string name="delete_note_msg">Вы действительно хотите удалить заметку?</string>
+
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="cancel">Отмена</string>
 </resources>

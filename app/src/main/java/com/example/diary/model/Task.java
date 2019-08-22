@@ -1,4 +1,4 @@
-package com.example.diary.tasks;
+package com.example.diary.model;
 
 import android.support.annotation.NonNull;
 

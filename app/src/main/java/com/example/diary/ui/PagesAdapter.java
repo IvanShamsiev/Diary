@@ -1,11 +1,11 @@
-package com.example.diary;
+package com.example.diary.ui;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.example.diary.notes.NotesFragment;
-import com.example.diary.tasks.TasksFragment;
+import com.example.diary.ui.notes.NotesFragment;
+import com.example.diary.ui.tasks.TasksFragment;
 
 public class PagesAdapter extends FragmentPagerAdapter {
 

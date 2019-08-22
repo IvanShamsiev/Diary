@@ -1,4 +1,4 @@
-package com.example.diary.tasks;
+package com.example.diary.ui.tasks;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

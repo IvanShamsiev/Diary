@@ -1,4 +1,4 @@
-package com.example.diary.tasks;
+package com.example.diary.ui.tasks;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import android.widget.SimpleAdapter;
 
 import com.example.diary.R;
 import com.example.diary.db.DiaryDao;
+import com.example.diary.model.Task;
 
 import java.util.ArrayList;
 import java.util.Arrays;
