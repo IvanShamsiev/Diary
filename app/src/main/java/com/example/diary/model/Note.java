@@ -1,8 +1,12 @@
 package com.example.diary.model;
 
+import android.support.annotation.NonNull;
+
 import java.util.Date;
 
 public class Note {
+
+    public static final int NONE = -1;
 
     private long id;
     private String text;
@@ -59,6 +63,7 @@ public class Note {
     }
 
     @Override
+    @NonNull
     public String toString() {
         return "Note{" +
                 "id=" + id +

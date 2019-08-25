@@ -11,7 +11,7 @@ import com.example.diary.model.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.diary.ui.MainActivity.LOG_TAG;
+import static com.example.diary.DiaryApp.LOG_TAG;
 
 public class DiaryDao {
 
@@ -56,7 +56,7 @@ public class DiaryDao {
     }
 
     public static Note getNoteById(String id) {
-        return getNoteById(Integer.parseInt(id));
+        return getNoteById(Long.parseLong(id));
     }
 
     public static Note saveNote(Note n) {
@@ -75,7 +75,7 @@ public class DiaryDao {
 
         long id;
 
-        if (n.getId() != -1) {
+        if (n.getId() != Note.NONE) {
             db.update("Notes", cv, "id = ?", getStringArrayId(n.getId()));
             id = n.getId();
         } else id = db.insert("Notes", null, cv);
@@ -101,6 +101,8 @@ public class DiaryDao {
                 tasks.add(new Task(c.getString(c.getColumnIndex("id")),
                         c.getString(c.getColumnIndex("name")),
                         c.getString(c.getColumnIndex("description")),
+                        c.getString(c.getColumnIndex("progress")),
+                        c.getString(c.getColumnIndex("lastChangeTime")),
                         c.getString(c.getColumnIndex("childFor"))));
             } while (c.moveToNext());
         } else Log.d(LOG_TAG, "Таблица пуста");
@@ -121,40 +123,66 @@ public class DiaryDao {
         return allTasks;
     }
 
-    public static Task getTaskById(int id) {
+    public static Task getTaskById(long id) {
         for (Task t: allTasks) if (t.getId() == id) return t;
         throw new RuntimeException("Задачи с id = " + id + " не существует");
     }
 
     public static Task getTaskById(String id) {
-        return getTaskById(Integer.parseInt(id));
+        return getTaskById(Long.parseLong(id));
     }
 
-    public static Task addTask(Task t) {
-        ContentValues cv = new ContentValues(4);
+    /*public static Task addTask(Task t) {
+        ContentValues cv = new ContentValues(5);
 
         cv.put("name", t.getName());
         cv.put("description", t.getDescription());
+        cv.put("progress", t.getProgress());
+        cv.put("lastChangeTime", System.currentTimeMillis());
         cv.put("childFor", t.getChildFor());
 
-        int id = (int) db.insert("Tasks", null, cv);
+        long id = db.insert("Tasks", null, cv);
 
-        return new Task(id, t.getName(), t.getDescription(), t.getChildFor());
+        return new Task(id, t.getName(), t.getDescription(), t.getProgress(), t.getLastChangeTime(), t.getChildFor());
     }
 
     public static Task updateTask(Task t) {
-        ContentValues cv = new ContentValues(4);
+        ContentValues cv = new ContentValues(5);
 
         cv.put("name", t.getName());
         cv.put("description", t.getDescription());
+        cv.put("progress", t.getProgress());
+        cv.put("lastChangeTime", System.currentTimeMillis());
         cv.put("childFor", t.getChildFor());
 
         db.update("Tasks", cv, "id = ?", getStringArrayId(t.getId()));
 
         return t;
+    }*/
+
+    public static Task saveTask(Task t) {
+        ContentValues cv = new ContentValues(5);
+
+        long currentTime = System.currentTimeMillis();
+
+        cv.put("name", t.getName());
+        cv.put("description", t.getDescription());
+        cv.put("progress", t.getProgress());
+        cv.put("lastChangeTime", currentTime);
+        cv.put("childFor", t.getChildFor());
+
+        long id;
+
+        if (t.getId() != Task.NONE) {
+            db.update("Tasks", cv, "id = ?", getStringArrayId(t.getId()));
+            id = t.getId();
+        } else id = db.insert("Tasks", null, cv);
+
+        return new Task(id, t.getName(), t.getDescription(), t.getProgress(), currentTime, t.getChildFor());
     }
 
-    public static void deleteTask(int id) {
+    public static void deleteTask(long id) {
+        for (Task t: getTaskById(id).getChildTasks()) deleteTask(t.getId());
         db.delete("Tasks","id = ?", getStringArrayId(id));
     }
 

@@ -9,7 +9,7 @@ import android.util.Log;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.example.diary.ui.MainActivity.LOG_TAG;
+import static com.example.diary.DiaryApp.LOG_TAG;
 
 public class DbHelper extends SQLiteOpenHelper {
 
@@ -21,6 +21,8 @@ public class DbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.d(LOG_TAG, " --- Создание базы данных --- ");
 
+        //db.execSQL("PRAGMA foreign_keys = ON");
+
         db.execSQL("create table Notes (" +
                 "id integer primary key, " +
                 "text text, " +
@@ -28,12 +30,12 @@ public class DbHelper extends SQLiteOpenHelper {
                 ")"
         );
 
-
         db.execSQL("create table Tasks (" +
                 "id integer primary key, " +
                 "name text, " +
                 "description text, " +
-                "category text," +
+                "progress integer," +
+                "lastChangeTime integer," +
                 "childFor integer" +
                 ")"
         );
@@ -61,6 +63,8 @@ public class DbHelper extends SQLiteOpenHelper {
             contentValues.clear();
             contentValues.put("name", defaultTasksName.get(i));
             contentValues.put("description", defaultTasksDescription.get(i));
+            contentValues.put("progress", 0);
+            contentValues.put("lastChangeTime", System.currentTimeMillis());
             contentValues.put("childFor", defaultTasksChildFor.get(i));
             db.insert("Tasks", null, contentValues);
         }

@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,19 +14,17 @@ import com.example.diary.R;
 import com.example.diary.db.DiaryDao;
 import com.example.diary.model.Note;
 
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
+
+import static com.example.diary.DiaryApp.dateFormat;
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
-
-    public static final SimpleDateFormat dateFormat =
-            new SimpleDateFormat("dd.mm.yyyy HH:mm", Locale.getDefault());
 
     private List<Note> notes;
 
     private OnNoteClickListener onNoteClickListener;
+
 
     NotesAdapter(OnNoteClickListener listener) {
         onNoteClickListener = listener;

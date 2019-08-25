@@ -13,4 +13,8 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="cancel">Отмена</string>
+    <string name="delete_task_question">Удалить задачу?</string>
+    <string name="delete_task_msg">Вы действительно хотите удалить эту задачу и всё её дочерние задачи?</string>
+    <string name="delete_task_menu_item">Удалить задачу</string>
+    <string name="settings">Настройки</string>
 </resources>

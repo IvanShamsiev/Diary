@@ -21,8 +21,6 @@ import com.example.diary.model.Note;
 
 import java.util.ArrayList;
 
-import static com.example.diary.ui.MainActivity.LOG_TAG;
-
 public class NotesFragment extends Fragment {
 
     NotesAdapter adapter;
@@ -48,15 +46,14 @@ public class NotesFragment extends Fragment {
         fab.setOnClickListener(btn -> createNewNote());
 
         // Set adapter
-        adapter = new NotesAdapter(note -> startActivityForResult(
-                NoteDetailsActivity.getIntent(getContext(), note.getId()), NOTE_DETAILS_CODE));
+        adapter = new NotesAdapter(this::editNote);
         adapter.setNotes(new ArrayList<>(DiaryDao.getAllNotes()));
 
         // Set recycler view
-        RecyclerView notesListView = view.findViewById(R.id.recyclerViewNotes);
-        notesListView.setLayoutManager(new LinearLayoutManager(getContext(),
+        RecyclerView notesRecyclerView = view.findViewById(R.id.recyclerViewNotes);
+        notesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(),
                 LinearLayoutManager.VERTICAL, false));
-        notesListView.setAdapter(adapter);
+        notesRecyclerView.setAdapter(adapter);
 
         return view;
     }
@@ -82,18 +79,16 @@ public class NotesFragment extends Fragment {
                     .show();
             return true;
         }
-        Log.d(LOG_TAG, "ID: " + item.getItemId());
         return super.onContextItemSelected(item);
     }
 
     private void createNewNote() {
-        Note note = new Note(-1, "", System.currentTimeMillis());
+        Note note = Note.getEmptyNote();
         editNote(note);
     }
 
     private void editNote(Note note) {
-        Intent intent = new Intent(getContext(), NoteDetailsActivity.class);
-        intent.putExtra("noteId", note.getId());
+        Intent intent = NoteDetailsActivity.getIntent(getContext(), note.getId());
         startActivityForResult(intent, NOTE_DETAILS_CODE);
     }
 }

@@ -15,7 +15,7 @@
         android:textSize="12pt"
         android:ellipsize="end"
         android:maxLines="1"
-        tools:text="Название задачи" />
+        tools:text="Название заметки" />
 
     <TextView
         android:id="@+id/listItemNote_twLastChangeTime"

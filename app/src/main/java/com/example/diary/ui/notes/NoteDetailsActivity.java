@@ -23,8 +23,7 @@ import com.example.diary.model.Note;
 
 import java.util.Date;
 
-import static com.example.diary.ui.notes.NotesAdapter.dateFormat;
-
+import static com.example.diary.DiaryApp.dateFormat;
 import static com.example.diary.ui.prefs.SettingsFragment.NOTES_AUTO_SAVE_PREF;
 import static com.example.diary.ui.prefs.SettingsFragment.NOTES_SAVE_DIALOG_PREF;
 import static com.example.diary.ui.prefs.SettingsFragment.NOTES_TEXT_SIZE_PREF;
