@@ -7,14 +7,17 @@
 
     <string name="save_note_question">Сохранить?</string>
     <string name="save_note_msg">Заметка была изменена, сохранить изменения?</string>
+    <string name="delete_note_menu_item">Удалить заметку</string>
     <string name="delete_note_question">Удалить заметку?</string>
     <string name="delete_note_msg">Вы действительно хотите удалить заметку?</string>
 
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="cancel">Отмена</string>
+    <string name="settings">Настройки</string>
+
+
+    <string name="delete_task_menu_item">Удалить задачу</string>
     <string name="delete_task_question">Удалить задачу?</string>
     <string name="delete_task_msg">Вы действительно хотите удалить эту задачу и всё её дочерние задачи?</string>
-    <string name="delete_task_menu_item">Удалить задачу</string>
-    <string name="settings">Настройки</string>
 </resources>

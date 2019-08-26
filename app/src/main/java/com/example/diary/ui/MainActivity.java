@@ -5,6 +5,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import com.example.diary.R;
 import com.example.diary.ui.prefs.PreferencesActivity;
@@ -26,7 +27,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(getString(R.string.settings)).setIntent(PreferencesActivity.getIntent(this));
+        menu.add(getString(R.string.settings)).setIntent(PreferencesActivity.getIntent(this))
+                .setIcon(R.drawable.ic_settings_white_48dp)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }
 }

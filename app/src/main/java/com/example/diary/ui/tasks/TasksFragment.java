@@ -22,9 +22,9 @@ import java.util.ArrayList;
 
 public class TasksFragment extends Fragment {
 
-    TasksAdapter adapter;
-
     public static final int TASK_DETAILS_CODE = 0;
+
+    TasksAdapter adapter;
 
     public static TasksFragment newInstance() {
         return new TasksFragment();
@@ -39,7 +39,6 @@ public class TasksFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tasks, container, false);
-
 
         // Set fab
         FloatingActionButton fab = view.findViewById(R.id.fabTasks);

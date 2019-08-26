@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,9 +22,9 @@ import java.util.ArrayList;
 
 public class NotesFragment extends Fragment {
 
-    NotesAdapter adapter;
-
     public static final int NOTE_DETAILS_CODE = 0;
+
+    NotesAdapter adapter;
 
     public static NotesFragment newInstance() {
         return new NotesFragment();
@@ -66,8 +65,8 @@ public class NotesFragment extends Fragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        long id = item.getIntent().getLongExtra("noteId", -1);
-        if (item.getTitle().equals("Удалить заметку")) {
+        long id = NotesAdapter.getNoteIdFromIntent(item.getIntent());
+        if (item.getTitle().equals(getString(R.string.delete_note_menu_item))) {
             new AlertDialog.Builder(getContext())
                     .setTitle(R.string.delete_note_question)
                     .setMessage(R.string.delete_note_msg)

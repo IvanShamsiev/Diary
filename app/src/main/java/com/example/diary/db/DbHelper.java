@@ -43,10 +43,12 @@ public class DbHelper extends SQLiteOpenHelper {
 
         String currentDate = String.valueOf(System.currentTimeMillis());
 
-        List<String> defaultNotesText = Arrays.asList("Текст записи 1", "Текст записи 2", "Текст записи 3", "Текст записи 4", "Текст записи 5");
-
-        List<String> defaultTasksName = Arrays.asList("Задача 1", "Задача 2", "Задача 3", "Задача 4", "Задача 5");
-        List<String> defaultTasksDescription = Arrays.asList("Описание задачи 1", "Описание задачи 2", "Описание задачи 3", "Описание задачи 4", "Описание задачи 5");
+        List<String> defaultNotesText = Arrays.asList(
+                "Текст записи 1", "Текст записи 2", "Текст записи 3", "Текст записи 4", "Текст записи 5");
+        List<String> defaultTasksName = Arrays.asList(
+                "Задача 1", "Задача 2", "Задача 3", "Задача 4", "Задача 5");
+        List<String> defaultTasksDescription = Arrays.asList(
+                "Описание задачи 1", "Описание задачи 2", "Описание задачи 3", "Описание задачи 4", "Описание задачи 5");
         List<Integer> defaultTasksChildFor = Arrays.asList(-1, -1, -1, 1, 2);
 
 

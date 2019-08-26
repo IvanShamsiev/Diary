@@ -22,8 +22,8 @@ import static com.example.diary.DiaryApp.dateFormat;
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
 
     private List<Note> notes;
-
     private OnNoteClickListener onNoteClickListener;
+    static final String INTENT_NOTE_ID = "noteId";
 
 
     NotesAdapter(OnNoteClickListener listener) {
@@ -84,9 +84,13 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo cmi) {
-            MenuItem item = menu.add("Удалить заметку");
-            item.setIntent(new Intent().putExtra("noteId", noteId));
+            MenuItem item = menu.add(v.getContext().getString(R.string.delete_note_menu_item));
+            item.setIntent(new Intent().putExtra(INTENT_NOTE_ID, noteId));
         }
+    }
+
+    static long getNoteIdFromIntent(Intent intent) {
+        return intent.getLongExtra(INTENT_NOTE_ID, Note.NONE);
     }
 
     interface OnNoteClickListener {

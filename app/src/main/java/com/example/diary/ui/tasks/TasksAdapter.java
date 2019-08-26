@@ -99,17 +99,18 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
             twName.setText(task.getName());
             taskProgressBar.setProgress(task.getProgress());
 
-            if (task.getChildTasks().size() == 0) btnChildTasks.setVisibility(View.GONE);
-            else btnChildTasks.setOnClickListener(btn -> {
-                if (childTasksRecyclerView.getVisibility() == View.VISIBLE) {
-                    childTasksRecyclerView.setVisibility(View.GONE);
-                    btnChildTasks.setImageResource(android.R.drawable.arrow_down_float);
-                }
-                else {
-                    childTasksRecyclerView.setVisibility(View.VISIBLE);
-                    btnChildTasks.setImageResource(android.R.drawable.arrow_up_float);
-                }
-            });
+            if (!task.getChildTasks().isEmpty()) {
+                btnChildTasks.setVisibility(View.VISIBLE);
+                btnChildTasks.setOnClickListener(btn -> {
+                    if (childTasksRecyclerView.getVisibility() == View.VISIBLE) {
+                        childTasksRecyclerView.setVisibility(View.GONE);
+                        btnChildTasks.setImageResource(android.R.drawable.arrow_down_float);
+                    } else {
+                        childTasksRecyclerView.setVisibility(View.VISIBLE);
+                        btnChildTasks.setImageResource(android.R.drawable.arrow_up_float);
+                    }
+                });
+            } else btnChildTasks.setVisibility(View.GONE);
 
             TasksAdapter adapter = new TasksAdapter(task.getId(), onTaskClickListener);
             adapter.setTasks(new ArrayList<>(DiaryDao.getAllTasks()));

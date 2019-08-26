@@ -171,7 +171,7 @@ public class NoteDetailsActivity extends AppCompatActivity {
     // Return intent for start this activity
     static Intent getIntent(Context context, long noteId) {
         Intent intent = new Intent(context, NoteDetailsActivity.class);
-        intent.putExtra("noteId", noteId);
+        intent.putExtra(NotesAdapter.INTENT_NOTE_ID, noteId);
         return intent;
     }
 }
