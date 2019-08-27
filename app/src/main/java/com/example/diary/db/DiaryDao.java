@@ -123,6 +123,16 @@ public class DiaryDao {
         return allTasks;
     }
 
+    public static List<Task> getChildrenForTask(List<Task> tasks, long parentId) {
+        List<Task> list = new ArrayList<>();
+        for (Task t: tasks) if (t.getChildFor() == parentId) list.add(t);
+        return list;
+    }
+
+    public static List<Task> getChildrenForTask(long parentId) {
+        return getChildrenForTask(allTasks, parentId);
+    }
+
     public static Task getTaskById(long id) {
         for (Task t: allTasks) if (t.getId() == id) return t;
         throw new RuntimeException("Задачи с id = " + id + " не существует");
@@ -181,8 +191,8 @@ public class DiaryDao {
         return new Task(id, t.getName(), t.getDescription(), t.getProgress(), currentTime, t.getChildFor());
     }
 
-    public static void deleteTask(long id) {
-        for (Task t: getTaskById(id).getChildTasks()) deleteTask(t.getId());
+    public static void removeTask(long id) {
+        for (Task t: getTaskById(id).getChildTasks()) removeTask(t.getId());
         db.delete("Tasks","id = ?", getStringArrayId(id));
     }
 

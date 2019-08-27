@@ -1,8 +1,7 @@
 package com.example.diary.ui.tasks;
 
-import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
@@ -18,21 +17,25 @@ import com.example.diary.R;
 import com.example.diary.db.DiaryDao;
 import com.example.diary.model.Task;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHolder>  {
 
-    private long showChildFor;
     private List<Task> tasks;
     private OnTaskClickListener onTaskClickListener;
-    private static final String INTENT_TASK_ID = "taskId";
+
+    private TaskViewHolder parentViewHolder;
 
 
-    TasksAdapter(long showChildFor, OnTaskClickListener listener) {
-        this.showChildFor = showChildFor;
-        onTaskClickListener = listener;
+    private TasksAdapter(List<Task> tasks, OnTaskClickListener listener, TaskViewHolder parentViewHolder) {
+        this.tasks = tasks;
+        this.onTaskClickListener = listener;
+        this.parentViewHolder = parentViewHolder;
+    }
+
+    TasksAdapter(List<Task> tasks, OnTaskClickListener listener) {
+        this(tasks, listener, null);
     }
 
     @NonNull
@@ -41,7 +44,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_task,
                 parent, false);
 
-        return new TaskViewHolder(view, parent.getContext());
+        return new TaskViewHolder(view);
     }
 
     @Override
@@ -54,48 +57,70 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         return tasks.size();
     }
 
-    void setTasks(List<Task> tasks) {
-        List<Task> showTasks = new ArrayList<>();
-        for (Task t: tasks) if (t.getChildFor() == showChildFor) showTasks.add(t);
+    void dataUpdate() {
+        DiaryDao.updateTasks();
+
+        long parentTaskId = parentViewHolder.getTaskId();
+        List<Task> showTasks = DiaryDao.getChildrenForTask(parentTaskId);
         Collections.sort(showTasks, (t1, t2) ->
                 t2.getLastChangeTime().compareTo(t1.getLastChangeTime()));
         this.tasks = showTasks;
+
         notifyDataSetChanged();
     }
 
-    void dataUpdate() {
+    private void removeTask(Task task) {
+        int position = tasks.indexOf(task);
+
+        tasks.remove(task);
+        notifyItemRemoved(position);
+
+        DiaryDao.removeTask(task.getId());
         DiaryDao.updateTasks();
-        setTasks(DiaryDao.getAllTasks());
+
+        if (parentViewHolder != null && tasks.isEmpty()) {
+            parentViewHolder.clearRecyclerView();
+        }
     }
 
-    class TaskViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+    class TaskViewHolder extends RecyclerView.ViewHolder implements
+            View.OnClickListener,
+            View.OnCreateContextMenuListener,
+            MenuItem.OnMenuItemClickListener {
 
-        TextView twName;
-        ImageButton btnChildTasks;
-        ProgressBar taskProgressBar;
-        RecyclerView childTasksRecyclerView;
+        private TextView twName;
+        private ImageButton btnChildTasks;
+        private ProgressBar taskProgressBar;
+        private RecyclerView childTasksRecyclerView;
 
-        long taskId;
+        private MenuItem deleteItem;
+        private AlertDialog deleteDialog;
 
-        TaskViewHolder(@NonNull View itemView, Context context) {
+        private Task task;
+
+        TaskViewHolder(@NonNull View itemView) {
             super(itemView);
 
             twName = itemView.findViewById(R.id.twName);
             btnChildTasks = itemView.findViewById(R.id.btnChildTasks);
             taskProgressBar = itemView.findViewById(R.id.taskProgressBar);
             childTasksRecyclerView = itemView.findViewById(R.id.childTasksRecyclerView);
-
-            childTasksRecyclerView.setLayoutManager(new LinearLayoutManager(context,
+            childTasksRecyclerView.setLayoutManager(new LinearLayoutManager(null,
                     LinearLayoutManager.VERTICAL, false));
 
-
-            itemView.findViewById(R.id.mainLayout).setOnClickListener(
-                    v -> onTaskClickListener.onClick(tasks.get(getLayoutPosition())));
+            itemView.findViewById(R.id.mainLayout).setOnClickListener(this);
             itemView.findViewById(R.id.mainLayout).setOnCreateContextMenuListener(this);
+
+            deleteDialog = new AlertDialog.Builder(itemView.getContext())
+                    .setTitle(R.string.delete_task_question)
+                    .setMessage(R.string.delete_task_msg)
+                    .setNegativeButton(R.string.no, (di, i) -> di.cancel())
+                    .setPositiveButton(R.string.yes, (di, i) -> removeTask(task))
+                    .create();
         }
 
         void bind(Task task) {
-            taskId = task.getId();
+            this.task = task;
             twName.setText(task.getName());
             taskProgressBar.setProgress(task.getProgress());
 
@@ -112,23 +137,36 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
                 });
             } else btnChildTasks.setVisibility(View.GONE);
 
-            TasksAdapter adapter = new TasksAdapter(task.getId(), onTaskClickListener);
-            adapter.setTasks(new ArrayList<>(DiaryDao.getAllTasks()));
-            childTasksRecyclerView.setAdapter(adapter);
+            childTasksRecyclerView.setAdapter(
+                    new TasksAdapter(task.getChildTasks(), onTaskClickListener, this));
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (onTaskClickListener != null) onTaskClickListener.onClick(task);
         }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo cmi) {
-            MenuItem item = menu.add(v.getContext().getString(R.string.delete_task_menu_item));
-            item.setIntent(new Intent().putExtra(INTENT_TASK_ID, taskId));
+            deleteItem = menu.add(v.getContext().getString(R.string.delete_task_menu_item));
+            deleteItem.setOnMenuItemClickListener(this);
         }
-    }
 
-    static long getTaskIdFromIntent(Intent intent) {
-        return intent.getLongExtra(INTENT_TASK_ID, Task.NONE);
-    }
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            if (item.equals(deleteItem)) {
+                deleteDialog.show();
+                return true;
+            }
+            return false;
+        }
 
-    interface OnTaskClickListener {
-        void onClick(Task task);
+        long getTaskId() {
+            return task.getId();
+        }
+
+        void clearRecyclerView() {
+            btnChildTasks.setVisibility(View.GONE);
+        }
     }
 }

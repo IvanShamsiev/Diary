@@ -18,8 +18,6 @@ import com.example.diary.R;
 import com.example.diary.db.DiaryDao;
 import com.example.diary.model.Task;
 
-import java.util.ArrayList;
-
 public class TasksFragment extends Fragment {
 
     public static final int TASK_DETAILS_CODE = 0;
@@ -45,8 +43,7 @@ public class TasksFragment extends Fragment {
         fab.setOnClickListener(btn -> createNewTask());
 
         // Set adapter
-        adapter = new TasksAdapter(Task.NOT_CHILD, this::editTask);
-        adapter.setTasks(new ArrayList<>(DiaryDao.getAllTasks()));
+        adapter = new TasksAdapter(DiaryDao.getChildrenForTask(Task.NOT_CHILD), this::editTask);
 
         // Set recycler view
         RecyclerView tasksRecyclerView = view.findViewById(R.id.recyclerViewTasks);
@@ -61,24 +58,6 @@ public class TasksFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK) return;
         if (requestCode == TASK_DETAILS_CODE) adapter.dataUpdate();
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        long id = TasksAdapter.getTaskIdFromIntent(item.getIntent());
-        if (item.getTitle().equals(getString(R.string.delete_task_menu_item))) {
-            new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.delete_task_question)
-                    .setMessage(R.string.delete_task_msg)
-                    .setNegativeButton(R.string.no, (di, i) -> di.cancel())
-                    .setPositiveButton(R.string.yes, (di, i) -> {
-                        DiaryDao.deleteTask(id);
-                        adapter.dataUpdate();
-                    })
-                    .show();
-            return true;
-        }
-        return super.onContextItemSelected(item);
     }
 
     private void createNewTask() {

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 public class Task {
 
@@ -19,7 +20,7 @@ public class Task {
 
     private long childFor;
 
-    private Collection<Task> childTasks;
+    private List<Task> childTasks;
 
     public Task(long id, String name, String description, int progress, Date lastChangeTime, long childFor) {
         this.id = id;
@@ -96,11 +97,11 @@ public class Task {
         this.childFor = childFor;
     }
 
-    public Collection<Task> getChildTasks() {
+    public List<Task> getChildTasks() {
         return childTasks;
     }
 
-    public void setChildTasks(Collection<Task> childTasks) {
+    public void setChildTasks(List<Task> childTasks) {
         this.childTasks = childTasks;
     }
 
