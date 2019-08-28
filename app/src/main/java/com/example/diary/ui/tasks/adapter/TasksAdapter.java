@@ -1,4 +1,4 @@
-package com.example.diary.ui.tasks;
+package com.example.diary.ui.tasks.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -34,7 +34,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         this.parentViewHolder = parentViewHolder;
     }
 
-    TasksAdapter(List<Task> tasks, OnTaskClickListener listener) {
+    public TasksAdapter(List<Task> tasks, OnTaskClickListener listener) {
         this(tasks, listener, null);
     }
 
@@ -57,10 +57,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         return tasks.size();
     }
 
-    void dataUpdate() {
+    public void dataUpdate() {
         DiaryDao.updateTasks();
 
-        long parentTaskId = parentViewHolder.getTaskId();
+        long parentTaskId = parentViewHolder == null ? Task.NOT_CHILD : parentViewHolder.getTaskId();
         List<Task> showTasks = DiaryDao.getChildrenForTask(parentTaskId);
         Collections.sort(showTasks, (t1, t2) ->
                 t2.getLastChangeTime().compareTo(t1.getLastChangeTime()));
@@ -79,7 +79,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         DiaryDao.updateTasks();
 
         if (parentViewHolder != null && tasks.isEmpty()) {
-            parentViewHolder.clearRecyclerView();
+            parentViewHolder.onClearRecyclerView();
         }
     }
 
@@ -165,7 +165,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
             return task.getId();
         }
 
-        void clearRecyclerView() {
+        void onClearRecyclerView() {
             btnChildTasks.setVisibility(View.GONE);
         }
     }

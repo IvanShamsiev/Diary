@@ -4,7 +4,6 @@
     <string name="note">Заметка</string>
     <string name="note_text">Текст заметки</string>
     <string name="last_change">Последнее изменение: %s</string>
-
     <string name="save_note_question">Сохранить?</string>
     <string name="save_note_msg">Заметка была изменена, сохранить изменения?</string>
     <string name="delete_note_menu_item">Удалить заметку</string>
@@ -15,9 +14,23 @@
     <string name="no">Нет</string>
     <string name="cancel">Отмена</string>
     <string name="settings">Настройки</string>
+    <string name="save">Сохранить</string>
+    <string name="delete">Удалить</string>
 
 
+    <string name="task">Задача</string>
     <string name="delete_task_menu_item">Удалить задачу</string>
     <string name="delete_task_question">Удалить задачу?</string>
     <string name="delete_task_msg">Вы действительно хотите удалить эту задачу и всё её дочерние задачи?</string>
+    <string name="task_name">Название задачи:</string>
+    <string name="new_task_name">Новая задача</string>
+    <string name="task_description">Описание задачи:</string>
+    <string name="new_task_description">Описание новой задачи (не обязательно)</string>
+    <string name="task_complete_progress">Прогресс выполнения:</string>
+    <string name="child_tasks">Дочерние задачи:</string>
+    <string name="child_tasks_none">Дочерние задачи отсутствуют</string>
+    <string name="add_child_task">Добавить дочернюю задачу</string>
+    <string name="save_task_question">Сохранить?</string>
+    <string name="save_task_msg">Задача была изменена, сохранить изменения?</string>
+
 </resources>

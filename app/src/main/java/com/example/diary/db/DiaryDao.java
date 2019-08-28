@@ -62,7 +62,7 @@ public class DiaryDao {
     public static Note saveNote(Note n) {
 
         if (n.getText().isEmpty()) {
-            deleteNote(n.getId());
+            removeNote(n.getId());
             return Note.getEmptyNote();
         }
 
@@ -83,7 +83,7 @@ public class DiaryDao {
         return new Note(id, n.getText(), currentTime);
     }
 
-    public static void deleteNote(long id) {
+    public static void removeNote(long id) {
         db.delete("Notes","id = ?", getStringArrayId(id));
     }
 

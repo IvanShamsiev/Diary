@@ -6,17 +6,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.diary.R;
 import com.example.diary.db.DiaryDao;
 import com.example.diary.model.Task;
+import com.example.diary.ui.tasks.adapter.TasksAdapter;
 
 public class TasksFragment extends Fragment {
 

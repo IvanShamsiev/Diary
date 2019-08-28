@@ -72,7 +72,7 @@ public class NotesFragment extends Fragment {
                     .setMessage(R.string.delete_note_msg)
                     .setNegativeButton(R.string.no, (di, i) -> di.cancel())
                     .setPositiveButton(R.string.yes, (di, i) -> {
-                        DiaryDao.deleteNote(id);
+                        DiaryDao.removeNote(id);
                         adapter.dataUpdate();
                     })
                     .show();

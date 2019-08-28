@@ -23,8 +23,6 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ui.tasks.TaskDetailsActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".ui.tasks.TaskEditActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

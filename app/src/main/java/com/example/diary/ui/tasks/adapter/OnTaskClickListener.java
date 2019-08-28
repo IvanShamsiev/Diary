@@ -1,4 +1,4 @@
-package com.example.diary.ui.tasks;
+package com.example.diary.ui.tasks.adapter;
 
 import com.example.diary.model.Task;
 

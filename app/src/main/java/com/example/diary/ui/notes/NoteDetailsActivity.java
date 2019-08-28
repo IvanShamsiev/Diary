@@ -127,7 +127,7 @@ public class NoteDetailsActivity extends AppCompatActivity {
                         .setMessage(R.string.delete_note_msg)
                         .setNegativeButton(R.string.no, (di, i) -> di.cancel())
                         .setPositiveButton(R.string.yes, (di, i) -> {
-                            DiaryDao.deleteNote(note.getId());
+                            DiaryDao.removeNote(note.getId());
                             setResult(Activity.RESULT_OK);
                             finish();
                         })
