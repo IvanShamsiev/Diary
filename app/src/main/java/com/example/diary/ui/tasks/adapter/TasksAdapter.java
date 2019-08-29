@@ -23,19 +23,27 @@ import java.util.List;
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHolder>  {
 
     private List<Task> tasks;
-    private OnTaskClickListener onTaskClickListener;
+    private OnClickListener onClickListener;
+    private OnDeleteTaskListener onDeleteTaskListener;
 
     private TaskViewHolder parentViewHolder;
+    private long parentTaskId;
 
-
-    private TasksAdapter(List<Task> tasks, OnTaskClickListener listener, TaskViewHolder parentViewHolder) {
+    private TasksAdapter(List<Task> tasks, OnClickListener clickListener,
+                         OnDeleteTaskListener deleteTaskListener, TaskViewHolder parentViewHolder) {
         this.tasks = tasks;
-        this.onTaskClickListener = listener;
+        this.onClickListener = clickListener;
+        this.onDeleteTaskListener = deleteTaskListener;
         this.parentViewHolder = parentViewHolder;
+        parentTaskId = parentViewHolder == null ? Task.NONE : parentViewHolder.getTaskId();
     }
 
-    public TasksAdapter(List<Task> tasks, OnTaskClickListener listener) {
-        this(tasks, listener, null);
+    private TasksAdapter(List<Task> tasks, OnClickListener clickListener, TaskViewHolder parentViewHolder) {
+        this(tasks, clickListener, null, parentViewHolder);
+    }
+
+    public TasksAdapter(List<Task> tasks, OnClickListener clickListener) {
+        this(tasks, clickListener, null);
     }
 
     @NonNull
@@ -57,10 +65,17 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         return tasks.size();
     }
 
+    public void setOnDeleteTaskListener(OnDeleteTaskListener onDeleteTaskListener) {
+        this.onDeleteTaskListener = onDeleteTaskListener;
+    }
+
+    public void setParentTaskId(long parentTaskId) {
+        this.parentTaskId = parentTaskId;
+    }
+
     public void dataUpdate() {
         DiaryDao.updateTasks();
 
-        long parentTaskId = parentViewHolder == null ? Task.NOT_CHILD : parentViewHolder.getTaskId();
         List<Task> showTasks = DiaryDao.getChildrenForTask(parentTaskId);
         Collections.sort(showTasks, (t1, t2) ->
                 t2.getLastChangeTime().compareTo(t1.getLastChangeTime()));
@@ -115,7 +130,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
                     .setTitle(R.string.delete_task_question)
                     .setMessage(R.string.delete_task_msg)
                     .setNegativeButton(R.string.no, (di, i) -> di.cancel())
-                    .setPositiveButton(R.string.yes, (di, i) -> removeTask(task))
+                    .setPositiveButton(R.string.yes, (di, i) -> {
+                        removeTask(task);
+                        if (onDeleteTaskListener != null) onDeleteTaskListener.onDelete();
+                    })
                     .create();
         }
 
@@ -138,12 +156,12 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
             } else btnChildTasks.setVisibility(View.GONE);
 
             childTasksRecyclerView.setAdapter(
-                    new TasksAdapter(task.getChildTasks(), onTaskClickListener, this));
+                    new TasksAdapter(task.getChildTasks(), onClickListener, onDeleteTaskListener, this));
         }
 
         @Override
         public void onClick(View v) {
-            if (onTaskClickListener != null) onTaskClickListener.onClick(task);
+            if (onClickListener != null) onClickListener.onClick(task);
         }
 
         @Override

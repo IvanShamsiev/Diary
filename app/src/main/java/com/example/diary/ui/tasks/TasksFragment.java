@@ -56,7 +56,9 @@ public class TasksFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK) return;
-        if (requestCode == TASK_DETAILS_CODE) adapter.dataUpdate();
+        if (requestCode == TASK_DETAILS_CODE) {
+            adapter.dataUpdate();
+        }
     }
 
     private void createNewTask() {

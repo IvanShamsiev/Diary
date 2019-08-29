@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -29,24 +28,27 @@ import static com.example.diary.ui.tasks.TasksFragment.TASK_DETAILS_CODE;
 
 public class TaskDetailsActivity extends AppCompatActivity {
 
-    public static final int TASK_CHANGED_CODE = 1;
+    // Constants for Intent
     private static final String INTENT_TASK_ID = "taskId";
+    private static final String INTENT_CHILD_FOR = "childFor";
 
+    // Model
+    Task task;
+
+    // UI
     EditText etTaskName;
     EditText etTaskDescription;
     SeekBar seekBarProgress;
     TextView twRecyclerEmpty;
     RecyclerView rvChildTasks;
     Button btnAddChildTask;
-
+    AlertDialog closeDialog, deleteDialog;
     MenuItem saveTaskItem;
-    AlertDialog deleteDialog;
-    AlertDialog closeDialog;
 
-    Task task;
-
+    // Child tasks adapter
     TasksAdapter adapter;
 
+    // Save indicator
     boolean saved = true;
 
     @Override
@@ -65,13 +67,18 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
 
         // Set task from DB or new
-        long id = getIntent().getLongExtra("taskId", -1);
-        if (id == -1) task = Task.getEmptyTask();
-        else task = DiaryDao.getTaskById(id);
+        long id = getIntent().getLongExtra(INTENT_TASK_ID, -1);
+        if (id == -1) {
+            task = Task.getEmptyTask();
+            task.setChildFor(getIntent().getLongExtra(INTENT_CHILD_FOR, -1));
+        } else task = DiaryDao.getTaskById(id);
+
 
 
         // Set recycler view adapter
-        adapter = new TasksAdapter(task.getChildTasks(), this::editTask);
+        adapter = new TasksAdapter(task.getChildTasks(), this::editChildTask);
+        adapter.setOnDeleteTaskListener(() -> setResult(Activity.RESULT_OK));
+        adapter.setParentTaskId(task.getId());
 
 
         // Bind UI
@@ -96,9 +103,11 @@ public class TaskDetailsActivity extends AppCompatActivity {
                         LinearLayoutManager.VERTICAL, false));
                 rvChildTasks.setAdapter(adapter);
             } else twRecyclerEmpty.setVisibility(View.VISIBLE);
-            btnAddChildTask.setOnClickListener(btn -> createNewTask());
+            btnAddChildTask.setOnClickListener(btn -> createChildTask());
         } else btnAddChildTask.setVisibility(View.GONE);
 
+
+        // Set dialogs
         closeDialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.save_task_question)
                 .setMessage(R.string.save_task_msg)
@@ -109,17 +118,33 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 .setNegativeButton(R.string.no, (di, i) -> finish())
                 .setNeutralButton(R.string.cancel, (di, i) -> di.cancel())
                 .create();
+        deleteDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.delete_task_question)
+                .setMessage(R.string.delete_task_msg)
+                .setPositiveButton(R.string.yes, (di, i) -> {
+                    DiaryDao.removeTask(task.getId());
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                })
+                .setNegativeButton(R.string.no, (di, i) -> di.cancel())
+                .setNeutralButton(R.string.cancel, (di, i) -> di.cancel())
+                .create();
 
 
         // Set on change listeners
         TextWatcher textWatcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence chs, int s, int c, int a) { }
             @Override public void onTextChanged(CharSequence chs, int s, int b, int c) { }
-            @Override public void afterTextChanged(Editable e) { saved = false; saveTaskItem.setVisible(true); }
+            @Override public void afterTextChanged(Editable e) {
+                saved = false;
+                saveTaskItem.setVisible(true);
+            }
         };
-
         SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar sb, int p, boolean fu) { saved = false; saveTaskItem.setVisible(true); }
+            @Override public void onProgressChanged(SeekBar sb, int p, boolean fu) {
+                saved = false;
+                saveTaskItem.setVisible(true);
+            }
             @Override public void onStartTrackingTouch(SeekBar seekBar) { }
             @Override public void onStopTrackingTouch(SeekBar seekBar) { }
         };
@@ -130,23 +155,21 @@ public class TaskDetailsActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) return;
+        if (requestCode == TASK_DETAILS_CODE) {
+            adapter.dataUpdate();
+            setResult(Activity.RESULT_OK);
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_task_delete, menu);
 
         // Set delete note item
         MenuItem deleteItem = menu.getItem(0);
         deleteItem.setOnMenuItemClickListener(menuItem -> {
-            if (deleteDialog == null)
-                deleteDialog = new AlertDialog.Builder(this)
-                        .setTitle(R.string.delete_task_question)
-                        .setMessage(R.string.delete_task_msg)
-                        .setNegativeButton(R.string.no, (di, i) -> di.cancel())
-                        .setPositiveButton(R.string.yes, (di, i) -> {
-                            DiaryDao.removeTask(task.getId());
-                            setResult(Activity.RESULT_OK);
-                            finish();
-                        })
-                        .create();
             deleteDialog.show();
             return true;
         });
@@ -182,14 +205,19 @@ public class TaskDetailsActivity extends AppCompatActivity {
         setResult(Activity.RESULT_OK);
     }
 
-    private void createNewTask() {
-        Task task = Task.getEmptyTask();
-        editTask(task);
+    private void createChildTask() {
+        Intent intent = getIntent(this, Task.NONE);
+        intent.putExtra(INTENT_CHILD_FOR, task.getId());
+        startActivityForResult(intent, TASK_DETAILS_CODE);
     }
 
-    private void editTask(Task task) {
-        Intent intent = getIntent(this, task.getId());
+    private void editChildTask(long childTaskId) {
+        Intent intent = getIntent(this, childTaskId);
         startActivityForResult(intent, TASK_DETAILS_CODE);
+    }
+
+    private void editChildTask(Task task) {
+        editChildTask(task.getId());
     }
 
     public static Intent getIntent(Context context, long taskId) {
